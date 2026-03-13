@@ -50,31 +50,88 @@
   <section id="page-5" class="page" style="display:none">
     <h2>What is your address?</h2>
     <div>
-      <label for="address">Address *</label><br>
-      <input type="text" id="address">
+      <label for="address-street">Street Address *</label><br>
+      <input type="text" id="address-street">
+    </div>
+    <br>
+    <div>
+      <label for="address-apt">Apt / Unit Number <span style="font-weight:normal;">(optional)</span></label><br>
+      <input type="text" id="address-apt">
+    </div>
+    <br>
+    <div>
+      <label for="address-city">City *</label><br>
+      <input type="text" id="address-city">
+    </div>
+    <br>
+    <div>
+      <label for="address-state">State *</label><br>
+      <select id="address-state">
+        <option value="">-- Select a State --</option>
+        <option>Alabama</option><option>Alaska</option><option>Arizona</option>
+        <option>Arkansas</option><option>California</option><option>Colorado</option>
+        <option>Connecticut</option><option>Delaware</option><option>Florida</option>
+        <option>Georgia</option><option>Hawaii</option><option>Idaho</option>
+        <option>Illinois</option><option>Indiana</option><option>Iowa</option>
+        <option>Kansas</option><option>Kentucky</option><option>Louisiana</option>
+        <option>Maine</option><option>Maryland</option><option>Massachusetts</option>
+        <option>Michigan</option><option>Minnesota</option><option>Mississippi</option>
+        <option>Missouri</option><option>Montana</option><option>Nebraska</option>
+        <option>Nevada</option><option>New Hampshire</option><option>New Jersey</option>
+        <option>New Mexico</option><option>New York</option><option>North Carolina</option>
+        <option>North Dakota</option><option>Ohio</option><option>Oklahoma</option>
+        <option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option>
+        <option>South Carolina</option><option>South Dakota</option><option>Tennessee</option>
+        <option>Texas</option><option>Utah</option><option>Vermont</option>
+        <option>Virginia</option><option>Washington</option><option>West Virginia</option>
+        <option>Wisconsin</option><option>Wyoming</option>
+      </select>
     </div>
   </section>
 
   <!-- Page 6: Emergency Contact & Authorized Users -->
   <section id="page-6" class="page" style="display:none">
 
+    <h2>List of Authorized Users</h2>
+    <p>The following people are authorized on your account:</p>
+    <ul id="auto-authorized-list"></ul>
+
+    <hr>
+
     <h2>Emergency Contact</h2>
     <p>Please provide at least one emergency contact.</p>
 
     <div id="emergency-contacts-list"></div>
 
+    <div id="pending-ec-form" style="display:none">
+      <fieldset>
+        <legend>New Emergency Contact</legend>
+        <label>First Name *<br><input type="text" id="pec-firstname"></label><br><br>
+        <label>Last Name *<br><input type="text" id="pec-lastname"></label><br><br>
+        <label>Phone *<br><input type="tel" id="pec-phone"></label><br><br>
+        <label><input type="checkbox" id="pec-authorized"> Also add as authorized user</label><br><br>
+        <button type="button" id="confirm-add-ec">Add</button>
+      </fieldset>
+    </div>
+
     <button type="button" id="add-emergency-contact">Add Emergency Contact</button>
 
     <hr>
 
-    <h2>Authorized Users</h2>
-    <p>The following people are already included as authorized users:</p>
-
-    <ul id="auto-authorized-list"></ul>
-
+    <h2>Additional Authorized Users</h2>
     <p>You may add up to 10 additional authorized users below.</p>
 
     <div id="authorized-users-list"></div>
+
+    <div id="pending-au-form" style="display:none">
+      <fieldset>
+        <legend>New Authorized User</legend>
+        <label>First Name *<br><input type="text" id="pau-firstname"></label><br><br>
+        <label>Last Name *<br><input type="text" id="pau-lastname"></label><br><br>
+        <label>Phone<br><input type="tel" id="pau-phone"></label><br><br>
+        <button type="button" id="confirm-add-au">Add</button>
+      </fieldset>
+    </div>
 
     <button type="button" id="add-authorized-user">Add Authorized User</button>
 
@@ -229,13 +286,15 @@
       const list = document.getElementById('emergency-contacts-list');
       list.innerHTML = '';
       emergencyContacts.forEach((ec, i) => {
+        const fullName = [ec.firstName, ec.lastName].filter(Boolean).join(' ');
+        const canRemove = emergencyContacts.length > 1;
         const div = document.createElement('div');
         div.innerHTML = `
           <fieldset>
             <legend>Emergency Contact ${i + 1}</legend>
-            <label>Name *<br><input type="text" value="${ec.name}" oninput="emergencyContacts[${i}].name = this.value; renderAutoAuthorizedList();"></label><br><br>
-            <label>Phone *<br><input type="tel" value="${ec.phone}" oninput="emergencyContacts[${i}].phone = this.value"></label><br><br>
-            <button type="button" onclick="removeEmergencyContact(${i})">Remove</button>
+            <strong>${fullName}</strong>${ec.phone ? ' — ' + ec.phone : ''}
+            ${ec.addAsAuthorized ? ' <em>(Authorized User)</em>' : ''}<br><br>
+            <button type="button" onclick="removeEmergencyContact(${i})" ${canRemove ? '' : 'disabled'} style="opacity:${canRemove ? '1' : '0.4'}">Remove</button>
           </fieldset>
         `;
         list.appendChild(div);
@@ -243,11 +302,33 @@
     }
 
     document.getElementById('add-emergency-contact').addEventListener('click', () => {
-      emergencyContacts.push({ name: '', phone: '' });
+      document.getElementById('pec-firstname').value = '';
+      document.getElementById('pec-lastname').value = '';
+      document.getElementById('pec-phone').value = '';
+      document.getElementById('pec-authorized').checked = false;
+      document.getElementById('pending-ec-form').style.display = 'block';
+      document.getElementById('add-emergency-contact').style.display = 'none';
+    });
+
+    document.getElementById('confirm-add-ec').addEventListener('click', () => {
+      const firstName = document.getElementById('pec-firstname').value.trim();
+      const lastName = document.getElementById('pec-lastname').value.trim();
+      const phone = document.getElementById('pec-phone').value.trim();
+      const addAsAuthorized = document.getElementById('pec-authorized').checked;
+      const err = document.getElementById('error-msg');
+      if (!firstName) { err.textContent = "Please enter the emergency contact's first name."; return; }
+      if (!lastName) { err.textContent = "Please enter the emergency contact's last name."; return; }
+      if (!phone) { err.textContent = "Please enter the emergency contact's phone number."; return; }
+      err.textContent = '';
+      emergencyContacts.push({ firstName, lastName, phone, addAsAuthorized });
       renderEmergencyContacts();
+      renderAutoAuthorizedList();
+      document.getElementById('pending-ec-form').style.display = 'none';
+      document.getElementById('add-emergency-contact').style.display = 'inline';
     });
 
     function removeEmergencyContact(i) {
+      if (emergencyContacts.length <= 1) return;
       emergencyContacts.splice(i, 1);
       renderEmergencyContacts();
       renderAutoAuthorizedList();
@@ -264,16 +345,27 @@
       const lastName = document.getElementById('lastname').value.trim();
       const selfName = [firstName, lastName].filter(Boolean).join(' ') || '(You)';
 
+      const selfPhone = document.getElementById('phone').value.trim();
       const selfLi = document.createElement('li');
-      selfLi.textContent = `${selfName} (You)`;
+      selfLi.textContent = `${selfName} (You)${selfPhone ? ' — ' + selfPhone : ''}`;
       ul.appendChild(selfLi);
 
-      emergencyContacts.forEach(ec => {
-        const name = ec.name.trim();
-        if (name) {
+      emergencyContacts.forEach((ec, i) => {
+        const fullName = [ec.firstName.trim(), ec.lastName.trim()].filter(Boolean).join(' ');
+        if (fullName && ec.addAsAuthorized) {
           const ecLi = document.createElement('li');
-          ecLi.textContent = `${name} (Emergency Contact)`;
+          const canRemove = emergencyContacts.length > 1;
+          ecLi.innerHTML = `${fullName} (Emergency Contact)${ec.phone.trim() ? ' — ' + ec.phone.trim() : ''} <button type="button" onclick="removeEmergencyContact(${i})" ${canRemove ? '' : 'disabled title="Must keep at least one emergency contact"'}>Remove</button>`;
           ul.appendChild(ecLi);
+        }
+      });
+
+      authorizedUsers.forEach((u, i) => {
+        const fullName = [u.firstName.trim(), u.lastName.trim()].filter(Boolean).join(' ');
+        if (fullName) {
+          const uLi = document.createElement('li');
+          uLi.innerHTML = `${fullName} (Authorized User)${u.phone.trim() ? ' — ' + u.phone.trim() : ''} <button type="button" onclick="removeAuthorizedUser(${i})">Remove</button>`;
+          ul.appendChild(uLi);
         }
       });
     }
@@ -282,13 +374,12 @@
       const list = document.getElementById('authorized-users-list');
       list.innerHTML = '';
       authorizedUsers.forEach((u, i) => {
+        const fullName = [u.firstName, u.lastName].filter(Boolean).join(' ');
         const div = document.createElement('div');
         div.innerHTML = `
           <fieldset>
             <legend>Additional User ${i + 1}</legend>
-            <label>Name *<br><input type="text" value="${u.name}" oninput="authorizedUsers[${i}].name = this.value"></label><br>
-            <label>Phone<br><input type="tel" value="${u.phone}" oninput="authorizedUsers[${i}].phone = this.value"></label><br>
-            <button type="button" onclick="removeAuthorizedUser(${i})">Remove</button>
+            <strong>${fullName}</strong>${u.phone ? ' — ' + u.phone : ''}
           </fieldset>
         `;
         list.appendChild(div);
@@ -299,13 +390,32 @@
     }
 
     document.getElementById('add-authorized-user').addEventListener('click', () => {
-      authorizedUsers.push({ name: '', phone: '' });
+      document.getElementById('pau-firstname').value = '';
+      document.getElementById('pau-lastname').value = '';
+      document.getElementById('pau-phone').value = '';
+      document.getElementById('pending-au-form').style.display = 'block';
+      document.getElementById('add-authorized-user').style.display = 'none';
+    });
+
+    document.getElementById('confirm-add-au').addEventListener('click', () => {
+      const firstName = document.getElementById('pau-firstname').value.trim();
+      const lastName = document.getElementById('pau-lastname').value.trim();
+      const phone = document.getElementById('pau-phone').value.trim();
+      const err = document.getElementById('error-msg');
+      if (!firstName) { err.textContent = "Please enter the authorized user's first name."; return; }
+      if (!lastName) { err.textContent = "Please enter the authorized user's last name."; return; }
+      err.textContent = '';
+      authorizedUsers.push({ firstName, lastName, phone });
       renderAuthorizedUsers();
+      renderAutoAuthorizedList();
+      document.getElementById('pending-au-form').style.display = 'none';
+      document.getElementById('add-authorized-user').style.display = authorizedUsers.length >= 10 ? 'none' : 'inline';
     });
 
     function removeAuthorizedUser(i) {
       authorizedUsers.splice(i, 1);
       renderAuthorizedUsers();
+      renderAutoAuthorizedList();
     }
 
     // --- Own Insurance Toggle ---
@@ -406,8 +516,16 @@
       }
 
       if (n === 5) {
-        if (!document.getElementById('address').value.trim()) {
-          err.textContent = 'Please enter your address.';
+        if (!document.getElementById('address-street').value.trim()) {
+          err.textContent = 'Please enter your street address.';
+          return false;
+        }
+        if (!document.getElementById('address-city').value.trim()) {
+          err.textContent = 'Please enter your city.';
+          return false;
+        }
+        if (!document.getElementById('address-state').value) {
+          err.textContent = 'Please select your state.';
           return false;
         }
       }
@@ -417,21 +535,13 @@
           err.textContent = 'Please add at least one emergency contact.';
           return false;
         }
-        for (let i = 0; i < emergencyContacts.length; i++) {
-          if (!emergencyContacts[i].name.trim()) {
-            err.textContent = `Emergency contact ${i + 1}: Name is required.`;
-            return false;
-          }
-          if (!emergencyContacts[i].phone.trim()) {
-            err.textContent = `Emergency contact ${i + 1}: Phone is required.`;
-            return false;
-          }
+        if (document.getElementById('pending-ec-form').style.display !== 'none') {
+          err.textContent = 'Please finish adding the emergency contact or close the form.';
+          return false;
         }
-        for (let i = 0; i < authorizedUsers.length; i++) {
-          if (!authorizedUsers[i].name.trim()) {
-            err.textContent = `Additional authorized user ${i + 1}: Name is required.`;
-            return false;
-          }
+        if (document.getElementById('pending-au-form').style.display !== 'none') {
+          err.textContent = 'Please finish adding the authorized user or close the form.';
+          return false;
         }
       }
 
