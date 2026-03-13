@@ -106,11 +106,13 @@
     <div id="pending-ec-form" style="display:none">
       <fieldset>
         <legend>New Emergency Contact</legend>
-        <label>First Name *<br><input type="text" id="pec-firstname"></label><br><br>
-        <label>Last Name *<br><input type="text" id="pec-lastname"></label><br><br>
-        <label>Phone *<br><input type="tel" id="pec-phone"></label><br><br>
-        <label><input type="checkbox" id="pec-authorized"> Also add as authorized user</label><br><br>
-        <button type="button" id="confirm-add-ec">Add</button>
+        <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;">
+          <label>First Name *<br><input type="text" id="pec-firstname"></label>
+          <label>Last Name *<br><input type="text" id="pec-lastname"></label>
+          <label>Phone *<br><input type="tel" id="pec-phone"></label>
+          <label><input type="checkbox" id="pec-authorized"> Also add as authorized user</label>
+          <button type="button" id="confirm-add-ec">Add</button>
+        </div>
       </fieldset>
     </div>
 
@@ -126,10 +128,12 @@
     <div id="pending-au-form" style="display:none">
       <fieldset>
         <legend>New Authorized User</legend>
-        <label>First Name *<br><input type="text" id="pau-firstname"></label><br><br>
-        <label>Last Name *<br><input type="text" id="pau-lastname"></label><br><br>
-        <label>Phone<br><input type="tel" id="pau-phone"></label><br><br>
-        <button type="button" id="confirm-add-au">Add</button>
+        <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;">
+          <label>First Name *<br><input type="text" id="pau-firstname"></label>
+          <label>Last Name *<br><input type="text" id="pau-lastname"></label>
+          <label>Phone<br><input type="tel" id="pau-phone"></label>
+          <button type="button" id="confirm-add-au">Add</button>
+        </div>
       </fieldset>
     </div>
 
@@ -293,7 +297,7 @@
           <fieldset>
             <legend>Emergency Contact ${i + 1}</legend>
             <strong>${fullName}</strong>${ec.phone ? ' — ' + ec.phone : ''}
-            ${ec.addAsAuthorized ? ' <em>(Authorized User)</em>' : ''}<br><br>
+            ${ec.addAsAuthorized ? ' <em>(Authorized User)</em>' : ''}
             <button type="button" onclick="removeEmergencyContact(${i})" ${canRemove ? '' : 'disabled'} style="opacity:${canRemove ? '1' : '0.4'}">Remove</button>
           </fieldset>
         `;
@@ -350,21 +354,20 @@
       selfLi.textContent = `${selfName} (You)${selfPhone ? ' — ' + selfPhone : ''}`;
       ul.appendChild(selfLi);
 
-      emergencyContacts.forEach((ec, i) => {
+      emergencyContacts.forEach((ec) => {
         const fullName = [ec.firstName.trim(), ec.lastName.trim()].filter(Boolean).join(' ');
         if (fullName && ec.addAsAuthorized) {
           const ecLi = document.createElement('li');
-          const canRemove = emergencyContacts.length > 1;
-          ecLi.innerHTML = `${fullName} (Emergency Contact)${ec.phone.trim() ? ' — ' + ec.phone.trim() : ''} <button type="button" onclick="removeEmergencyContact(${i})" ${canRemove ? '' : 'disabled title="Must keep at least one emergency contact"'}>Remove</button>`;
+          ecLi.textContent = `${fullName} (Emergency Contact)${ec.phone.trim() ? ' — ' + ec.phone.trim() : ''}`;
           ul.appendChild(ecLi);
         }
       });
 
-      authorizedUsers.forEach((u, i) => {
+      authorizedUsers.forEach((u) => {
         const fullName = [u.firstName.trim(), u.lastName.trim()].filter(Boolean).join(' ');
         if (fullName) {
           const uLi = document.createElement('li');
-          uLi.innerHTML = `${fullName} (Authorized User)${u.phone.trim() ? ' — ' + u.phone.trim() : ''} <button type="button" onclick="removeAuthorizedUser(${i})">Remove</button>`;
+          uLi.textContent = `${fullName} (Authorized User)${u.phone.trim() ? ' — ' + u.phone.trim() : ''}`;
           ul.appendChild(uLi);
         }
       });
@@ -380,6 +383,7 @@
           <fieldset>
             <legend>Additional User ${i + 1}</legend>
             <strong>${fullName}</strong>${u.phone ? ' — ' + u.phone : ''}
+            <button type="button" onclick="removeAuthorizedUser(${i})">Remove</button>
           </fieldset>
         `;
         list.appendChild(div);
