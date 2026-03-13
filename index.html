@@ -10,58 +10,78 @@
   <h1>Intake Form</h1>
   <p>Page <span id="page-indicator"></span></p>
 
-  <!-- Page 1: Personal Information -->
+  <!-- Page 1: First Name -->
   <section id="page-1" class="page">
-    <h2>Personal Information</h2>
-
+    <h2>What is your first name?</h2>
     <div>
       <label for="firstname">First Name *</label><br>
-      <input type="text" id="firstname" required>
-    </div>
-
-    <div>
-      <label for="lastname">Last Name *</label><br>
-      <input type="text" id="lastname" required>
-    </div>
-
-    <div>
-      <label for="phone">Phone Number *</label><br>
-      <input type="tel" id="phone" required>
-    </div>
-
-    <div>
-      <label for="email">Email *</label><br>
-      <input type="email" id="email" required>
-    </div>
-
-    <div>
-      <label for="address">Address *</label><br>
-      <input type="text" id="address" required>
+      <input type="text" id="firstname">
     </div>
   </section>
 
-  <!-- Page 2: Emergency Contacts -->
+  <!-- Page 2: Last Name -->
   <section id="page-2" class="page" style="display:none">
-    <h2>Emergency Contacts</h2>
-    <p>Add at least one emergency contact (up to 10).</p>
+    <h2>What is your last name?</h2>
+    <div>
+      <label for="lastname">Last Name *</label><br>
+      <input type="text" id="lastname">
+    </div>
+  </section>
+
+  <!-- Page 3: Phone Number -->
+  <section id="page-3" class="page" style="display:none">
+    <h2>What is your phone number?</h2>
+    <div>
+      <label for="phone">Phone Number *</label><br>
+      <input type="tel" id="phone">
+    </div>
+  </section>
+
+  <!-- Page 4: Email -->
+  <section id="page-4" class="page" style="display:none">
+    <h2>What is your email address?</h2>
+    <div>
+      <label for="email">Email *</label><br>
+      <input type="email" id="email">
+    </div>
+  </section>
+
+  <!-- Page 5: Address -->
+  <section id="page-5" class="page" style="display:none">
+    <h2>What is your address?</h2>
+    <div>
+      <label for="address">Address *</label><br>
+      <input type="text" id="address">
+    </div>
+  </section>
+
+  <!-- Page 6: Emergency Contact & Authorized Users -->
+  <section id="page-6" class="page" style="display:none">
+
+    <h2>Emergency Contact</h2>
+    <p>Please provide at least one emergency contact.</p>
 
     <div id="emergency-contacts-list"></div>
 
     <button type="button" id="add-emergency-contact">Add Emergency Contact</button>
-  </section>
 
-  <!-- Page 3: Authorized Users -->
-  <section id="page-3" class="page" style="display:none">
+    <hr>
+
     <h2>Authorized Users</h2>
-    <p>Add at least one authorized user (up to 10).</p>
+    <p>The following people are already included as authorized users:</p>
+
+    <ul id="auto-authorized-list"></ul>
+
+    <p>You may add up to 10 additional authorized users below.</p>
 
     <div id="authorized-users-list"></div>
 
     <button type="button" id="add-authorized-user">Add Authorized User</button>
+
   </section>
 
-  <!-- Page 4: How Did You Hear About Us -->
-  <section id="page-4" class="page" style="display:none">
+  <!-- Page 7: How Did You Hear About Us -->
+  <section id="page-7" class="page" style="display:none">
     <h2>How Did You Hear About Us? *</h2>
 
     <div>
@@ -90,8 +110,8 @@
     </div>
   </section>
 
-  <!-- Page 5: Fees & Protection Plans -->
-  <section id="page-5" class="page" style="display:none">
+  <!-- Page 8: Fees & Protection Plans -->
+  <section id="page-8" class="page" style="display:none">
     <h2>Fees &amp; Protection Plans</h2>
 
     <h3>One-Time Admin Fee</h3>
@@ -105,6 +125,7 @@
     <table border="1" cellpadding="6" cellspacing="0">
       <thead>
         <tr>
+          <th>Select</th>
           <th>Tier</th>
           <th>Monthly Cost</th>
           <th>Coverage Amount</th>
@@ -113,25 +134,56 @@
       </thead>
       <tbody>
         <tr>
-          <td>Basic</td>
-          <td>$12/mo</td>
-          <td>Up to $2,000</td>
+          <td><input type="radio" name="protection-plan" value="basic" id="plan-basic"></td>
+          <td><label for="plan-basic">Basic</label></td>
+          <td>$11.00/mo</td>
+          <td>Up to $2,500</td>
           <td>Covers fire, flood, and theft</td>
         </tr>
         <tr>
-          <td>Standard</td>
-          <td>$22/mo</td>
-          <td>Up to $5,000</td>
+          <td><input type="radio" name="protection-plan" value="standard" id="plan-standard"></td>
+          <td><label for="plan-standard">Standard</label></td>
+          <td>$17.00/mo</td>
+          <td>Up to $4,000</td>
           <td>Covers fire, flood, theft, and vandalism</td>
         </tr>
         <tr>
-          <td>Premium</td>
-          <td>$35/mo</td>
-          <td>Up to $10,000</td>
+          <td><input type="radio" name="protection-plan" value="premium" id="plan-premium"></td>
+          <td><label for="plan-premium">Premium</label></td>
+          <td>$21.00/mo</td>
+          <td>Up to $5,000</td>
           <td>Full coverage including climate damage</td>
+        </tr>
+        <tr>
+          <td><input type="radio" name="protection-plan" value="own-insurance" id="plan-own"></td>
+          <td colspan="4"><label for="plan-own">I will provide my own Renter's or Homeowner's Insurance</label></td>
         </tr>
       </tbody>
     </table>
+
+    <div id="own-insurance-fields" style="display:none">
+      <h4>Insurance Information</h4>
+      <div>
+        <label for="insurance-provider">Insurance Provider *</label><br>
+        <input type="text" id="insurance-provider">
+      </div>
+      <div>
+        <label for="insurance-policy">Policy Number *</label><br>
+        <input type="text" id="insurance-policy">
+      </div>
+      <div>
+        <label for="insurance-agent">Agent Name</label><br>
+        <input type="text" id="insurance-agent">
+      </div>
+      <div>
+        <label for="insurance-phone">Agent Phone</label><br>
+        <input type="tel" id="insurance-phone">
+      </div>
+      <div>
+        <label for="insurance-expiry">Policy Expiration Date *</label><br>
+        <input type="date" id="insurance-expiry">
+      </div>
+    </div>
 
     <div>
       <label>
@@ -141,8 +193,8 @@
     </div>
   </section>
 
-  <!-- Page 6: Signature & ID Upload -->
-  <section id="page-6" class="page" style="display:none">
+  <!-- Page 9: Signature & ID Upload -->
+  <section id="page-9" class="page" style="display:none">
     <h2>Signature &amp; ID Upload</h2>
 
     <h3>Signature *</h3>
@@ -155,7 +207,7 @@
     <input type="file" id="id-upload" accept="image/*,.pdf">
 
     <br><br>
-    <button type="button" id="submit-form">Submit</button>
+    <button type="button" id="submit-form" style="display:none">Submit</button>
   </section>
 
   <!-- Navigation -->
@@ -167,44 +219,65 @@
   <p id="error-msg" style="color:red;"></p>
 
   <script>
-    const TOTAL_PAGES = 6;
+    const TOTAL_PAGES = 9;
     let currentPage = 1;
 
     // --- Emergency Contacts ---
     let emergencyContacts = [];
+
     function renderEmergencyContacts() {
       const list = document.getElementById('emergency-contacts-list');
       list.innerHTML = '';
-      emergencyContacts.forEach((c, i) => {
+      emergencyContacts.forEach((ec, i) => {
         const div = document.createElement('div');
         div.innerHTML = `
           <fieldset>
-            <legend>Contact ${i + 1}</legend>
-            <label>Name *<br><input type="text" value="${c.name}" oninput="emergencyContacts[${i}].name = this.value"></label><br>
-            <label>Phone *<br><input type="tel" value="${c.phone}" oninput="emergencyContacts[${i}].phone = this.value"></label><br>
-            <label>Relationship<br><input type="text" value="${c.relationship}" oninput="emergencyContacts[${i}].relationship = this.value"></label><br>
+            <legend>Emergency Contact ${i + 1}</legend>
+            <label>Name *<br><input type="text" value="${ec.name}" oninput="emergencyContacts[${i}].name = this.value; renderAutoAuthorizedList();"></label><br><br>
+            <label>Phone *<br><input type="tel" value="${ec.phone}" oninput="emergencyContacts[${i}].phone = this.value"></label><br><br>
             <button type="button" onclick="removeEmergencyContact(${i})">Remove</button>
           </fieldset>
         `;
         list.appendChild(div);
       });
-
-      document.getElementById('add-emergency-contact').style.display =
-        emergencyContacts.length >= 10 ? 'none' : 'inline';
     }
 
     document.getElementById('add-emergency-contact').addEventListener('click', () => {
-      emergencyContacts.push({ name: '', phone: '', relationship: '' });
+      emergencyContacts.push({ name: '', phone: '' });
       renderEmergencyContacts();
     });
 
     function removeEmergencyContact(i) {
       emergencyContacts.splice(i, 1);
       renderEmergencyContacts();
+      renderAutoAuthorizedList();
     }
 
     // --- Authorized Users ---
     let authorizedUsers = [];
+
+    function renderAutoAuthorizedList() {
+      const ul = document.getElementById('auto-authorized-list');
+      ul.innerHTML = '';
+
+      const firstName = document.getElementById('firstname').value.trim();
+      const lastName = document.getElementById('lastname').value.trim();
+      const selfName = [firstName, lastName].filter(Boolean).join(' ') || '(You)';
+
+      const selfLi = document.createElement('li');
+      selfLi.textContent = `${selfName} (You)`;
+      ul.appendChild(selfLi);
+
+      emergencyContacts.forEach(ec => {
+        const name = ec.name.trim();
+        if (name) {
+          const ecLi = document.createElement('li');
+          ecLi.textContent = `${name} (Emergency Contact)`;
+          ul.appendChild(ecLi);
+        }
+      });
+    }
+
     function renderAuthorizedUsers() {
       const list = document.getElementById('authorized-users-list');
       list.innerHTML = '';
@@ -212,7 +285,7 @@
         const div = document.createElement('div');
         div.innerHTML = `
           <fieldset>
-            <legend>User ${i + 1}</legend>
+            <legend>Additional User ${i + 1}</legend>
             <label>Name *<br><input type="text" value="${u.name}" oninput="authorizedUsers[${i}].name = this.value"></label><br>
             <label>Phone<br><input type="tel" value="${u.phone}" oninput="authorizedUsers[${i}].phone = this.value"></label><br>
             <button type="button" onclick="removeAuthorizedUser(${i})">Remove</button>
@@ -234,6 +307,15 @@
       authorizedUsers.splice(i, 1);
       renderAuthorizedUsers();
     }
+
+    // --- Own Insurance Toggle ---
+    document.querySelectorAll('input[name="protection-plan"]').forEach(r => {
+      r.addEventListener('change', () => {
+        const selected = document.querySelector('input[name="protection-plan"]:checked');
+        document.getElementById('own-insurance-fields').style.display =
+          selected && selected.value === 'own-insurance' ? 'block' : 'none';
+      });
+    });
 
     // --- Signature Canvas ---
     const canvas = document.getElementById('signature-canvas');
@@ -276,7 +358,12 @@
         submitBtn.style.display = 'inline';
       } else {
         nextBtn.style.display = 'inline';
-        if (submitBtn) submitBtn.style.display = 'none';
+        submitBtn.style.display = 'none';
+      }
+
+      // Refresh the auto-authorized list whenever page 6 is shown
+      if (n === 6) {
+        renderAutoAuthorizedList();
       }
 
       document.getElementById('error-msg').textContent = '';
@@ -286,49 +373,69 @@
       const err = document.getElementById('error-msg');
 
       if (n === 1) {
-        const fields = ['firstname', 'lastname', 'phone', 'email', 'address'];
-        for (const id of fields) {
-          const el = document.getElementById(id);
-          if (!el.value.trim()) {
-            err.textContent = `Please fill in all required fields.`;
-            return false;
-          }
+        if (!document.getElementById('firstname').value.trim()) {
+          err.textContent = 'Please enter your first name.';
+          return false;
         }
+      }
+
+      if (n === 2) {
+        if (!document.getElementById('lastname').value.trim()) {
+          err.textContent = 'Please enter your last name.';
+          return false;
+        }
+      }
+
+      if (n === 3) {
+        if (!document.getElementById('phone').value.trim()) {
+          err.textContent = 'Please enter your phone number.';
+          return false;
+        }
+      }
+
+      if (n === 4) {
         const email = document.getElementById('email').value.trim();
+        if (!email) {
+          err.textContent = 'Please enter your email address.';
+          return false;
+        }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
           err.textContent = 'Please enter a valid email address.';
           return false;
         }
       }
 
-      if (n === 2) {
+      if (n === 5) {
+        if (!document.getElementById('address').value.trim()) {
+          err.textContent = 'Please enter your address.';
+          return false;
+        }
+      }
+
+      if (n === 6) {
         if (emergencyContacts.length === 0) {
           err.textContent = 'Please add at least one emergency contact.';
           return false;
         }
         for (let i = 0; i < emergencyContacts.length; i++) {
-          const c = emergencyContacts[i];
-          if (!c.name.trim() || !c.phone.trim()) {
-            err.textContent = `Emergency contact ${i + 1}: Name and Phone are required.`;
+          if (!emergencyContacts[i].name.trim()) {
+            err.textContent = `Emergency contact ${i + 1}: Name is required.`;
             return false;
           }
-        }
-      }
-
-      if (n === 3) {
-        if (authorizedUsers.length === 0) {
-          err.textContent = 'Please add at least one authorized user.';
-          return false;
+          if (!emergencyContacts[i].phone.trim()) {
+            err.textContent = `Emergency contact ${i + 1}: Phone is required.`;
+            return false;
+          }
         }
         for (let i = 0; i < authorizedUsers.length; i++) {
           if (!authorizedUsers[i].name.trim()) {
-            err.textContent = `Authorized user ${i + 1}: Name is required.`;
+            err.textContent = `Additional authorized user ${i + 1}: Name is required.`;
             return false;
           }
         }
       }
 
-      if (n === 4) {
+      if (n === 7) {
         const selected = document.querySelector('input[name="referral"]:checked');
         if (!selected) {
           err.textContent = 'Please select how you heard about us.';
@@ -336,14 +443,33 @@
         }
       }
 
-      if (n === 5) {
+      if (n === 8) {
+        const selectedPlan = document.querySelector('input[name="protection-plan"]:checked');
+        if (!selectedPlan) {
+          err.textContent = 'Please select a protection plan or indicate you have your own insurance.';
+          return false;
+        }
+        if (selectedPlan.value === 'own-insurance') {
+          if (!document.getElementById('insurance-provider').value.trim()) {
+            err.textContent = 'Please enter your insurance provider.';
+            return false;
+          }
+          if (!document.getElementById('insurance-policy').value.trim()) {
+            err.textContent = 'Please enter your policy number.';
+            return false;
+          }
+          if (!document.getElementById('insurance-expiry').value) {
+            err.textContent = 'Please enter your policy expiration date.';
+            return false;
+          }
+        }
         if (!document.getElementById('fee-acknowledge').checked) {
           err.textContent = 'Please acknowledge the admin fee and protection plan information.';
           return false;
         }
       }
 
-      if (n === 6) {
+      if (n === 9) {
         if (!signatureDrawn) {
           err.textContent = 'Please provide your signature.';
           return false;
