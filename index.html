@@ -4,17 +4,377 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Intake Form</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #0d1b2a;
+      color: #e8edf2;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 17px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px 60px;
+    }
+
+    /* Header */
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-align: center;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    #page-indicator-wrapper {
+      text-align: center;
+      color: #7a9fc4;
+      font-size: 0.95rem;
+      margin-bottom: 28px;
+    }
+
+    /* Progress bar */
+    #progress-bar-container {
+      width: 100%;
+      max-width: 640px;
+      background: #1a2d42;
+      border-radius: 99px;
+      height: 6px;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #1a56db, #c0392b);
+      border-radius: 99px;
+      transition: width 0.35s ease;
+    }
+
+    /* Form card */
+    .form-card {
+      background: #132336;
+      border: 1px solid #1e3a5a;
+      border-radius: 14px;
+      padding: 36px 40px;
+      width: 100%;
+      max-width: 640px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    /* Headings inside pages */
+    .page h2 {
+      font-size: 1.45rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 20px;
+    }
+    .page h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #a8c8e8;
+      margin: 20px 0 10px;
+    }
+    .page h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #a8c8e8;
+      margin: 16px 0 8px;
+    }
+    .page p {
+      color: #a0b8cc;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    /* Labels & Inputs */
+    label {
+      display: block;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #b8d0e8;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="date"],
+    input[type="file"],
+    select {
+      width: 100%;
+      background: #0d1b2a;
+      border: 1.5px solid #1e3a5a;
+      border-radius: 8px;
+      color: #e8edf2;
+      font-size: 1rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="text"]:focus,
+    input[type="tel"]:focus,
+    input[type="email"]:focus,
+    input[type="date"]:focus,
+    select:focus {
+      border-color: #1a56db;
+      box-shadow: 0 0 0 3px rgba(26,86,219,0.2);
+    }
+    select option { background: #0d1b2a; }
+
+    .field-group {
+      margin-bottom: 18px;
+    }
+
+    /* Buttons */
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 10px 24px;
+      transition: background 0.2s, transform 0.1s;
+    }
+    button:active { transform: scale(0.97); }
+
+    /* Primary nav buttons */
+    #nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 28px;
+      width: 100%;
+      max-width: 640px;
+    }
+    #btn-next, #submit-form {
+      background: #1a56db;
+      color: #fff;
+      min-width: 120px;
+    }
+    #btn-next:hover, #submit-form:hover { background: #1648c0; }
+    #btn-prev {
+      background: #1e3a5a;
+      color: #a8c8e8;
+      min-width: 100px;
+    }
+    #btn-prev:hover { background: #263f5e; }
+
+    /* Inline action buttons (Add, Remove, etc.) */
+    button[id^="add-"],
+    button[id^="confirm-"] {
+      background: #1a56db;
+      color: #fff;
+      padding: 8px 18px;
+      font-size: 0.92rem;
+    }
+    button[id^="add-"]:hover,
+    button[id^="confirm-"]:hover { background: #1648c0; }
+
+    #clear-signature {
+      background: #c0392b;
+      color: #fff;
+      margin-top: 10px;
+      padding: 8px 18px;
+      font-size: 0.92rem;
+    }
+    #clear-signature:hover { background: #a93226; }
+
+    /* Fieldsets for EC / AU cards */
+    fieldset {
+      border: 1.5px solid #1e3a5a;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      background: #0d1b2a;
+    }
+    legend {
+      color: #7ab0d8;
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0 6px;
+    }
+    fieldset .inline-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    fieldset .inline-row label {
+      flex: 1;
+      min-width: 120px;
+      margin-bottom: 0;
+    }
+    fieldset .inline-row input {
+      margin-top: 4px;
+    }
+    fieldset button[onclick^="remove"] {
+      background: #c0392b;
+      color: #fff;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      margin-left: 8px;
+    }
+    fieldset button[onclick^="remove"]:hover { background: #a93226; }
+
+    /* Radio & Checkbox rows */
+    .radio-option, .check-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1.5px solid #1e3a5a;
+      background: #0d1b2a;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      font-size: 1rem;
+      color: #e8edf2;
+    }
+    .radio-option:hover, .check-option:hover {
+      border-color: #1a56db;
+      background: #112035;
+    }
+    .radio-option input, .check-option input {
+      width: auto;
+      accent-color: #1a56db;
+      transform: scale(1.25);
+      cursor: pointer;
+    }
+
+    /* Table for protection plans */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+    }
+    thead tr {
+      background: #1a2d42;
+    }
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      color: #7ab0d8;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      border-bottom: 2px solid #1e3a5a;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #1e3a5a;
+      color: #d0e0ee;
+    }
+    tbody tr:hover { background: #112035; }
+    tbody tr td input[type="radio"] {
+      width: auto;
+      accent-color: #1a56db;
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    /* HR */
+    hr {
+      border: none;
+      border-top: 1px solid #1e3a5a;
+      margin: 20px 0;
+    }
+
+    /* Signature canvas */
+    #signature-canvas {
+      border: 1.5px solid #1e3a5a;
+      border-radius: 8px;
+      background: #ffffff;
+      cursor: crosshair;
+      touch-action: none;
+      display: block;
+      max-width: 100%;
+    }
+
+    /* Authorized list */
+    #auto-authorized-list {
+      list-style: none;
+      padding: 0;
+    }
+    #auto-authorized-list li {
+      padding: 8px 14px;
+      border-radius: 7px;
+      background: #0d1b2a;
+      border: 1px solid #1e3a5a;
+      margin-bottom: 6px;
+      color: #c8dff0;
+      font-size: 0.97rem;
+    }
+
+    /* Error message */
+    #error-msg {
+      color: #f05252;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-align: center;
+      min-height: 22px;
+      margin-top: 12px;
+      max-width: 640px;
+      width: 100%;
+    }
+
+    /* Optional tag */
+    .optional-tag {
+      font-weight: 400;
+      color: #5a7a96;
+      font-size: 0.87rem;
+    }
+
+    /* own-insurance-fields spacing */
+    #own-insurance-fields {
+      margin-top: 16px;
+      padding: 16px;
+      border: 1.5px solid #1e3a5a;
+      border-radius: 10px;
+      background: #0d1b2a;
+    }
+    #own-insurance-fields .field-group:last-child { margin-bottom: 0; }
+
+    /* file input styling */
+    input[type="file"] {
+      padding: 8px 10px;
+      color: #a0b8cc;
+    }
+    input[type="file"]::-webkit-file-upload-button {
+      background: #1a56db;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    /* strong inside fieldset */
+    fieldset strong { color: #e8edf2; }
+    fieldset em { color: #7ab0d8; font-style: italic; }
+  </style>
 </head>
 <body>
 
   <h1>Intake Form</h1>
-  <p>Page <span id="page-indicator"></span></p>
+  <div id="page-indicator-wrapper">Step <span id="page-indicator"></span></div>
+  <div id="progress-bar-container"><div id="progress-bar"></div></div>
+
+  <div class="form-card">
 
   <!-- Page 1: First Name -->
   <section id="page-1" class="page">
     <h2>What is your first name?</h2>
-    <div>
-      <label for="firstname">First Name *</label><br>
+    <div class="field-group">
+      <label for="firstname">First Name *</label>
       <input type="text" id="firstname">
     </div>
   </section>
@@ -22,8 +382,8 @@
   <!-- Page 2: Last Name -->
   <section id="page-2" class="page" style="display:none">
     <h2>What is your last name?</h2>
-    <div>
-      <label for="lastname">Last Name *</label><br>
+    <div class="field-group">
+      <label for="lastname">Last Name *</label>
       <input type="text" id="lastname">
     </div>
   </section>
@@ -31,8 +391,8 @@
   <!-- Page 3: Phone Number -->
   <section id="page-3" class="page" style="display:none">
     <h2>What is your phone number?</h2>
-    <div>
-      <label for="phone">Phone Number *</label><br>
+    <div class="field-group">
+      <label for="phone">Phone Number *</label>
       <input type="tel" id="phone">
     </div>
   </section>
@@ -40,8 +400,8 @@
   <!-- Page 4: Email -->
   <section id="page-4" class="page" style="display:none">
     <h2>What is your email address?</h2>
-    <div>
-      <label for="email">Email *</label><br>
+    <div class="field-group">
+      <label for="email">Email *</label>
       <input type="email" id="email">
     </div>
   </section>
@@ -49,23 +409,24 @@
   <!-- Page 5: Address -->
   <section id="page-5" class="page" style="display:none">
     <h2>What is your address?</h2>
-    <div>
-      <label for="address-street">Street Address *</label><br>
+    <div class="field-group">
+      <label for="address-street">Street Address *</label>
       <input type="text" id="address-street">
     </div>
-    <br>
-    <div>
-      <label for="address-apt">Apt / Unit Number <span style="font-weight:normal;">(optional)</span></label><br>
+    <div class="field-group">
+      <label for="address-apt">Apt / Unit Number <span class="optional-tag">(optional)</span></label>
       <input type="text" id="address-apt">
     </div>
-    <br>
-    <div>
-      <label for="address-city">City *</label><br>
+    <div class="field-group">
+      <label for="address-city">City *</label>
       <input type="text" id="address-city">
     </div>
-    <br>
-    <div>
-      <label for="address-state">State *</label><br>
+    <div class="field-group">
+      <label for="address-zip">Zip Code *</label>
+      <input type="text" id="address-zip">
+    </div>
+    <div class="field-group">
+      <label for="address-state">State *</label>
       <select id="address-state">
         <option value="">-- Select a State --</option>
         <option>Alabama</option><option>Alaska</option><option>Arizona</option>
@@ -89,14 +450,8 @@
     </div>
   </section>
 
-  <!-- Page 6: Emergency Contact & Authorized Users -->
+  <!-- Page 6: Emergency Contacts -->
   <section id="page-6" class="page" style="display:none">
-
-    <h2>List of Authorized Users</h2>
-    <p>The following people are authorized on your account:</p>
-    <ul id="auto-authorized-list"></ul>
-
-    <hr>
 
     <h2>Emergency Contact</h2>
     <p>Please provide at least one emergency contact.</p>
@@ -106,17 +461,25 @@
     <div id="pending-ec-form" style="display:none">
       <fieldset>
         <legend>New Emergency Contact</legend>
-        <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;">
-          <label>First Name *<br><input type="text" id="pec-firstname"></label>
-          <label>Last Name *<br><input type="text" id="pec-lastname"></label>
-          <label>Phone *<br><input type="tel" id="pec-phone"></label>
-          <label><input type="checkbox" id="pec-authorized"> Also add as authorized user</label>
+        <div class="inline-row">
+          <label>First Name *<input type="text" id="pec-firstname"></label>
+          <label>Last Name *<input type="text" id="pec-lastname"></label>
+          <label>Phone *<input type="tel" id="pec-phone"></label>
           <button type="button" id="confirm-add-ec">Add</button>
         </div>
       </fieldset>
     </div>
 
     <button type="button" id="add-emergency-contact">Add Emergency Contact</button>
+
+  </section>
+
+  <!-- Page 7: Authorized Users -->
+  <section id="page-7" class="page" style="display:none">
+
+    <h2>List of Authorized Users</h2>
+    <p>The following people are authorized on your account:</p>
+    <ul id="auto-authorized-list"></ul>
 
     <hr>
 
@@ -128,10 +491,10 @@
     <div id="pending-au-form" style="display:none">
       <fieldset>
         <legend>New Authorized User</legend>
-        <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;">
-          <label>First Name *<br><input type="text" id="pau-firstname"></label>
-          <label>Last Name *<br><input type="text" id="pau-lastname"></label>
-          <label>Phone<br><input type="tel" id="pau-phone"></label>
+        <div class="inline-row">
+          <label>First Name *<input type="text" id="pau-firstname"></label>
+          <label>Last Name *<input type="text" id="pau-lastname"></label>
+          <label>Phone <span class="optional-tag">(optional)</span><input type="tel" id="pau-phone"></label>
           <button type="button" id="confirm-add-au">Add</button>
         </div>
       </fieldset>
@@ -141,38 +504,22 @@
 
   </section>
 
-  <!-- Page 7: How Did You Hear About Us -->
-  <section id="page-7" class="page" style="display:none">
+  <!-- Page 8: How Did You Hear About Us -->
+  <section id="page-8" class="page" style="display:none">
     <h2>How Did You Hear About Us? *</h2>
 
-    <div>
-      <label><input type="radio" name="referral" value="current-client"> Current Client</label>
-    </div>
-    <div>
-      <label><input type="radio" name="referral" value="friend-referral"> Friend Referral</label>
-    </div>
-    <div>
-      <label><input type="radio" name="referral" value="google-search"> Google Search</label>
-    </div>
-    <div>
-      <label><input type="radio" name="referral" value="google-maps"> Google Maps</label>
-    </div>
-    <div>
-      <label><input type="radio" name="referral" value="returning-client"> Returning Client</label>
-    </div>
-    <div>
-      <label><input type="radio" name="referral" value="sign-driveby"> Sign/Drive-by</label>
-    </div>
-    <div>
-      <label><input type="radio" name="referral" value="social-media"> Social Media</label>
-    </div>
-    <div>
-      <label><input type="radio" name="referral" value="uhaul"> U-Haul</label>
-    </div>
+    <label class="radio-option"><input type="radio" name="referral" value="current-client"> Current Client</label>
+    <label class="radio-option"><input type="radio" name="referral" value="friend-referral"> Friend Referral</label>
+    <label class="radio-option"><input type="radio" name="referral" value="google-search"> Google Search</label>
+    <label class="radio-option"><input type="radio" name="referral" value="google-maps"> Google Maps</label>
+    <label class="radio-option"><input type="radio" name="referral" value="returning-client"> Returning Client</label>
+    <label class="radio-option"><input type="radio" name="referral" value="sign-driveby"> Sign/Drive-by</label>
+    <label class="radio-option"><input type="radio" name="referral" value="social-media"> Social Media</label>
+    <label class="radio-option"><input type="radio" name="referral" value="uhaul"> U-Haul</label>
   </section>
 
-  <!-- Page 8: Fees & Protection Plans -->
-  <section id="page-8" class="page" style="display:none">
+  <!-- Page 9: Fees & Protection Plans -->
+  <section id="page-9" class="page" style="display:none">
     <h2>Fees &amp; Protection Plans</h2>
 
     <h3>One-Time Admin Fee</h3>
@@ -224,52 +571,53 @@
 
     <div id="own-insurance-fields" style="display:none">
       <h4>Insurance Information</h4>
-      <div>
-        <label for="insurance-provider">Insurance Provider *</label><br>
+      <div class="field-group">
+        <label for="insurance-provider">Insurance Provider *</label>
         <input type="text" id="insurance-provider">
       </div>
-      <div>
-        <label for="insurance-policy">Policy Number *</label><br>
+      <div class="field-group">
+        <label for="insurance-policy">Policy Number *</label>
         <input type="text" id="insurance-policy">
       </div>
-      <div>
-        <label for="insurance-agent">Agent Name</label><br>
+      <div class="field-group">
+        <label for="insurance-agent">Agent Name <span class="optional-tag">(optional)</span></label>
         <input type="text" id="insurance-agent">
       </div>
-      <div>
-        <label for="insurance-phone">Agent Phone</label><br>
+      <div class="field-group">
+        <label for="insurance-phone">Agent Phone <span class="optional-tag">(optional)</span></label>
         <input type="tel" id="insurance-phone">
       </div>
-      <div>
-        <label for="insurance-expiry">Policy Expiration Date *</label><br>
+      <div class="field-group">
+        <label for="insurance-expiry">Policy Expiration Date *</label>
         <input type="date" id="insurance-expiry">
       </div>
     </div>
 
-    <div>
-      <label>
-        <input type="checkbox" id="fee-acknowledge">
-        I have read and understand the one-time admin fee and protection plan options. *
-      </label>
-    </div>
+    <label class="check-option" style="margin-top:10px;">
+      <input type="checkbox" id="fee-acknowledge">
+      I have read and understand the one-time admin fee and protection plan options. *
+    </label>
   </section>
 
-  <!-- Page 9: Signature & ID Upload -->
-  <section id="page-9" class="page" style="display:none">
+  <!-- Page 10: Signature & ID Upload -->
+  <section id="page-10" class="page" style="display:none">
     <h2>Signature &amp; ID Upload</h2>
 
     <h3>Signature *</h3>
     <p>Sign in the box below using your mouse or finger.</p>
-    <canvas id="signature-canvas" width="500" height="150" style="border:1px solid #000; cursor:crosshair; touch-action:none;"></canvas>
+    <canvas id="signature-canvas" width="500" height="150"></canvas>
     <br>
     <button type="button" id="clear-signature">Clear Signature</button>
 
     <h3>Upload ID *</h3>
-    <input type="file" id="id-upload" accept="image/*,.pdf">
+    <div class="field-group">
+      <input type="file" id="id-upload" accept="image/*,.pdf">
+    </div>
 
-    <br><br>
     <button type="button" id="submit-form" style="display:none">Submit</button>
   </section>
+
+  </div><!-- end .form-card -->
 
   <!-- Navigation -->
   <div id="nav-buttons">
@@ -277,10 +625,10 @@
     <button type="button" id="btn-next">Next</button>
   </div>
 
-  <p id="error-msg" style="color:red;"></p>
+  <p id="error-msg"></p>
 
   <script>
-    const TOTAL_PAGES = 9;
+    const TOTAL_PAGES = 10;
     let currentPage = 1;
 
     // --- Emergency Contacts ---
@@ -309,7 +657,6 @@
       document.getElementById('pec-firstname').value = '';
       document.getElementById('pec-lastname').value = '';
       document.getElementById('pec-phone').value = '';
-      document.getElementById('pec-authorized').checked = false;
       document.getElementById('pending-ec-form').style.display = 'block';
       document.getElementById('add-emergency-contact').style.display = 'none';
     });
@@ -318,7 +665,7 @@
       const firstName = document.getElementById('pec-firstname').value.trim();
       const lastName = document.getElementById('pec-lastname').value.trim();
       const phone = document.getElementById('pec-phone').value.trim();
-      const addAsAuthorized = document.getElementById('pec-authorized').checked;
+      const addAsAuthorized = true;
       const err = document.getElementById('error-msg');
       if (!firstName) { err.textContent = "Please enter the emergency contact's first name."; return; }
       if (!lastName) { err.textContent = "Please enter the emergency contact's last name."; return; }
@@ -463,6 +810,7 @@
       document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
       document.getElementById(`page-${n}`).style.display = 'block';
       document.getElementById('page-indicator').textContent = `${n} of ${TOTAL_PAGES}`;
+      document.getElementById('progress-bar').style.width = `${(n / TOTAL_PAGES) * 100}%`;
       document.getElementById('btn-prev').style.display = n === 1 ? 'none' : 'inline';
 
       const nextBtn = document.getElementById('btn-next');
@@ -475,8 +823,8 @@
         submitBtn.style.display = 'none';
       }
 
-      // Refresh the auto-authorized list whenever page 6 is shown
-      if (n === 6) {
+      // Refresh the auto-authorized list whenever page 7 is shown
+      if (n === 7) {
         renderAutoAuthorizedList();
       }
 
@@ -528,6 +876,10 @@
           err.textContent = 'Please enter your city.';
           return false;
         }
+        if (!document.getElementById('address-zip').value.trim()) {
+          err.textContent = 'Please enter your zip code.';
+          return false;
+        }
         if (!document.getElementById('address-state').value) {
           err.textContent = 'Please select your state.';
           return false;
@@ -543,13 +895,16 @@
           err.textContent = 'Please finish adding the emergency contact or close the form.';
           return false;
         }
+      }
+
+      if (n === 7) {
         if (document.getElementById('pending-au-form').style.display !== 'none') {
           err.textContent = 'Please finish adding the authorized user or close the form.';
           return false;
         }
       }
 
-      if (n === 7) {
+      if (n === 8) {
         const selected = document.querySelector('input[name="referral"]:checked');
         if (!selected) {
           err.textContent = 'Please select how you heard about us.';
@@ -557,7 +912,7 @@
         }
       }
 
-      if (n === 8) {
+      if (n === 9) {
         const selectedPlan = document.querySelector('input[name="protection-plan"]:checked');
         if (!selectedPlan) {
           err.textContent = 'Please select a protection plan or indicate you have your own insurance.';
@@ -583,7 +938,7 @@
         }
       }
 
-      if (n === 9) {
+      if (n === 10) {
         if (!signatureDrawn) {
           err.textContent = 'Please provide your signature.';
           return false;
