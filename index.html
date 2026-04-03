@@ -612,7 +612,7 @@
 
     <h3>Upload ID *</h3>
     <div class="field-group">
-      <input type="file" id="id-upload" accept="image/*,.pdf">
+      <input type="file" id="id-upload" accept="image/*">
     </div>
 
     <button type="button" id="submit-form" style="display:none">Submit</button>
@@ -944,8 +944,13 @@
           err.textContent = 'Please provide your signature.';
           return false;
         }
-        if (!document.getElementById('id-upload').files.length) {
+        const idFile = document.getElementById('id-upload').files[0];
+        if (!idFile) {
           err.textContent = 'Please upload a copy of your ID.';
+          return false;
+        }
+        if (!idFile.type.startsWith('image/')) {
+          err.textContent = 'Your ID must be an image file (JPEG, PNG, etc.). PDFs are not accepted.';
           return false;
         }
       }
