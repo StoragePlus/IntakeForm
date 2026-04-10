@@ -15,7 +15,7 @@ exports.handler = async (event) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'greenpoint@nystorage.com',
+      from: 'storageplusemailproxy@gmail.com',
       to:   'greenpoint@nystorage.com',
       subject: `New Intake Form — ${lastName}, ${firstName}`,
       html: `<p>New intake form submission from <strong>${firstName} ${lastName}</strong>.</p><p>Please find the completed intake form attached.</p>`,
