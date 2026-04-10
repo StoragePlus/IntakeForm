@@ -17,8 +17,6 @@ async function generateAndDownloadPDF() {
   const contentW = pageW - margin * 2;
   let y = margin;
 
-  // ---- Helpers ----
-
   function checkPageBreak(needed = 20) {
     if (y + needed > pageH - margin) {
       doc.addPage();
@@ -52,7 +50,6 @@ async function generateAndDownloadPDF() {
 
   function spacer() { y += 8; }
 
-  // ---- Page header banner ----
   doc.setFillColor(13, 27, 42);
   doc.rect(0, 0, pageW, 62, 'F');
   // Red accent stripe
@@ -68,7 +65,7 @@ async function generateAndDownloadPDF() {
   doc.text(`Generated: ${new Date().toLocaleString()}`, pageW / 2, 52, { align: 'center' });
   y = 80;
 
-  // ---- Personal Information ----
+
   sectionHeader('Personal Information');
   field('First Name', document.getElementById('firstname').value.trim());
   field('Last Name', document.getElementById('lastname').value.trim());
@@ -76,7 +73,7 @@ async function generateAndDownloadPDF() {
   field('Email', document.getElementById('email').value.trim());
   spacer();
 
-  // ---- Address ----
+
   sectionHeader('Address');
   field('Street Address', document.getElementById('address-street').value.trim());
   const apt = document.getElementById('address-apt').value.trim();
@@ -86,7 +83,7 @@ async function generateAndDownloadPDF() {
   field('Zip Code', document.getElementById('address-zip').value.trim());
   spacer();
 
-  // ---- Emergency Contacts ----
+
   sectionHeader('Emergency Contacts');
   emergencyContacts.forEach((ec, i) => {
     const name = [ec.firstName, ec.lastName].filter(Boolean).join(' ');
@@ -94,7 +91,7 @@ async function generateAndDownloadPDF() {
   });
   spacer();
 
-  // ---- Authorized Users ----
+
   sectionHeader('Authorized Users');
   const selfFirst = document.getElementById('firstname').value.trim();
   const selfLast = document.getElementById('lastname').value.trim();
@@ -111,7 +108,7 @@ async function generateAndDownloadPDF() {
   });
   spacer();
 
-  // ---- Referral ----
+
   sectionHeader('How Did You Hear About Us');
   const referralEl = document.querySelector('input[name="referral"]:checked');
   const referralLabel = referralEl
@@ -120,7 +117,7 @@ async function generateAndDownloadPDF() {
   field('Referral Source', referralLabel);
   spacer();
 
-  // ---- Fees & Protection Plan ----
+
   sectionHeader('Fees & Protection Plan');
   field('One-Time Admin Fee', '$25.00');
   const planEl = document.querySelector('input[name="protection-plan"]:checked');
@@ -146,7 +143,7 @@ async function generateAndDownloadPDF() {
   field('Fees Acknowledged', 'Yes');
   spacer();
 
-  // ---- Signature ----
+
   sectionHeader('Signature');
   checkPageBreak(110);
   const sigDataUrl = canvas.toDataURL('image/png');
@@ -157,13 +154,12 @@ async function generateAndDownloadPDF() {
   doc.addImage(sigDataUrl, 'PNG', margin + 4, y + 4, contentW - 8, 92);
   y += 110;
 
-  // ---- Save ----
+
   const firstName = document.getElementById('firstname').value.trim() || 'form';
   const lastName = document.getElementById('lastname').value.trim() || 'submission';
   const fileName = `intake_${lastName}_${firstName}.pdf`;
   doc.save(fileName);
 
-  // ---- Email ----
   const pdfBase64 = doc.output('datauristring');
   fetch('/.netlify/functions/send-intake', {
     method: 'POST',
