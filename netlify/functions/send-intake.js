@@ -4,8 +4,6 @@ exports.handler = async (event) => {
   }
 
   const { pdf, fileName, firstName, lastName } = JSON.parse(event.body);
-
-  // Strip the data URI prefix to get raw base64
   const base64Content = pdf.split(',')[1];
 
   const response = await fetch('https://api.resend.com/emails', {
