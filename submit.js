@@ -1,6 +1,3 @@
-// submit.js — PDF generation on form submission
-// Depends on: jsPDF (loaded via CDN), and globals from index.html inline script:
-//   currentPage, validatePage(), emergencyContacts, authorizedUsers, canvas
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('submit-form').addEventListener('click', () => {
@@ -160,46 +157,24 @@ async function generateAndDownloadPDF() {
   doc.addImage(sigDataUrl, 'PNG', margin + 4, y + 4, contentW - 8, 92);
   y += 110;
 
-  // ---- ID Upload (last page) ----
-  const idFile = document.getElementById('id-upload').files[0];
-  if (idFile) {
-    await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target.result;
-        if (idFile.type.startsWith('image/')) {
-          doc.addPage();
-          y = margin;
-          sectionHeader('ID Upload');
-          const img = new Image();
-          img.onload = () => {
-            const maxW = contentW;
-            const maxH = pageH - y - margin;
-            const ratio = Math.min(maxW / img.width, maxH / img.height);
-            const imgW = img.width * ratio;
-            const imgH = img.height * ratio;
-            const fmt = idFile.type === 'image/jpeg' ? 'JPEG' : 'PNG';
-            doc.addImage(dataUrl, fmt, margin, y, imgW, imgH);
-            resolve();
-          };
-          img.src = dataUrl;
-        } else {
-          // PDF uploads can't be embedded — note it on the last page
-          doc.addPage();
-          y = margin;
-          sectionHeader('ID Upload');
-          doc.setFontSize(10);
-          doc.setTextColor(80, 80, 80);
-          doc.text('A PDF ID document was uploaded. It must be saved separately.', margin, y);
-          resolve();
-        }
-      };
-      reader.readAsDataURL(idFile);
-    });
-  }
-
   // ---- Save ----
   const firstName = document.getElementById('firstname').value.trim() || 'form';
   const lastName = document.getElementById('lastname').value.trim() || 'submission';
-  doc.save(`intake_${lastName}_${firstName}.pdf`);
+  const fileName = `intake_${lastName}_${firstName}.pdf`;
+  doc.save(fileName);
+
+  // ---- Email ----
+  const pdfBase64 = doc.output('datauristring');
+  fetch('/.netlify/functions/send-intake', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      pdf:       pdfBase64,
+      fileName:  fileName,
+      firstName: firstName,
+      lastName:  lastName,
+    }),
+  }).catch((err) => {
+    console.error('Send intake error:', err);
+  });
 }
